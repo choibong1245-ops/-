@@ -2,217 +2,327 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>새해 덕담 쪽지뽑기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>새해 덕담 캠페인</title>
+
   <style>
-    body{ margin:0; background:#fff; color:#111; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
-    .wrap{ max-width:980px; margin:0 auto; padding:28px 22px 50px; }
-    .h1{ font-size:66px; font-weight:900; margin:0 0 10px; letter-spacing:-1px; }
-    .h2{ font-size:62px; font-weight:900; margin:26px 0 10px; letter-spacing:-1px; }
-    .p{ font-size:30px; line-height:1.45; margin:0 0 8px; }
-    .star{ font-size:16px; color:#333; margin-top:8px; }
-    .center{ display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:18px; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #fff;
+    }
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 30px; margin-bottom: 8px; }
+    h2 { font-size: 20px; margin-top: 24px; }
+    p { line-height: 1.6; margin: 6px 0; }
+    .small { font-size: 13px; color: #666; }
 
-    .animBox{ width:520px; max-width:100%; border:3px solid #111; padding:22px; display:flex; justify-content:center; align-items:center; background:#fff; }
-    .animStage{ position:relative; width:260px; height:260px; max-width:75vw; max-height:75vw; }
-    .animStage img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; pointer-events:none; }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 20px;
+    }
 
-    .btnRow{ display:flex; gap:12px; width:520px; max-width:100%; }
-    .btnRow button{ flex:1; }
+    .gifbox {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .gifbox img {
+      max-width: 420px;
+      width: 100%;
+      border: 1px solid #bbb;
+      border-radius: 12px;
+    }
 
-    .noteBox{ width:520px; max-width:100%; border:3px solid #111; padding:16px; text-align:center; background:#fff; }
-    .noteLabel{ font-size:18px; color:#444; margin-bottom:6px; }
-    .noteTopic{ font-size:36px; font-weight:900; margin:0; }
+    .btnrow {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
 
-    input, textarea{ width:820px; max-width:100%; box-sizing:border-box; border:3px solid #111; padding:18px 16px; font-size:34px; outline:none; background:#fff; }
-    textarea{ min-height:88px; resize:vertical; }
-    button{ width:520px; max-width:100%; border:0; background:#fff; font-weight:900; cursor:pointer; font-size:34px; padding:14px; }
-    .submit{ width:820px; max-width:100%; border:0; font-size:36px; font-weight:900; margin-top:14px; padding:10px 0; }
-    button:disabled{ opacity:.55; cursor:not-allowed; }
-    .status{ margin-top:10px; font-size:18px; color:#111; }
+    button {
+      padding: 12px 18px;
+      border: 1px solid #111;
+      background: #fff;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
 
-    @media (max-width:640px){
-      .h1,.h2{ font-size:44px; }
-      .p{ font-size:22px; }
-      input, textarea{ font-size:24px; padding:14px 12px; }
-      button{ font-size:22px; }
-      .noteTopic{ font-size:28px; }
-      .submit{ font-size:28px; }
-      .animStage{ width:220px; height:220px; }
+    .resultbox {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .resultlabel {
+      display: inline-block;
+      border: 1px solid #111;
+      padding: 12px 20px;
+      border-radius: 14px;
+      min-width: 220px;
+    }
+    .resultlabel .top {
+      font-size: 14px;
+      color: #555;
+    }
+    .resultlabel .val {
+      font-size: 26px;
+      font-weight: 900;
+      margin-top: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media (min-width: 720px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #111;
+      border-radius: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .submitrow {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .submitbtn {
+      min-width: 240px;
+      font-size: 18px;
+      padding: 14px 20px;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+    }
+    .bad { color: #c33; font-weight: 700; }
+
+    .final {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 900;
+      padding: 30px 10px;
     }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="h1">소개말</div>
-    <p class="p">새해를 맞아 모두에게 전하는 따뜻한 한마디를 남겨주세요.</p>
+<div class="wrap">
 
-    <div class="h2">참여방법</div>
-    <p class="p">복주머니에서 나온 쪽지에 있는 주제에 맞춰 덕담을 남겨주세요.</p>
-    <p class="p">예시) 목표(꿈) - 올해는 원하는 곳에 취업하게 해주세요.</p>
-    <p class="star">
-      * 본 이벤트는 참여자 확인 및 경품 제공을 위해 이름과 전화번호를 수집하며,
-      수집된 개인정보는 이벤트 종료 후 즉시 파기됩니다.
-      개인정보 수집·이용에 동의하는 경우에만 참여가 가능합니다.
-    </p>
+  <h1>소개말</h1>
+  <p>새해를 맞아 모두에게 전하는 따뜻한 한마디를 남겨주세요.</p>
 
-    <div class="center">
-      <div class="animBox">
-        <div class="animStage">
-          <img id="imgIdle"  src="idle.png"  alt="idle" />
-          <img id="imgThrow" src="throw.gif" alt="throw" />
-          <img id="imgAfter" src="after.png" alt="after" />
-        </div>
-      </div>
+  <h2>참여방법</h2>
+  <p>복주머니를 눌러 행운의 제시어를 뽑아보세요! 뽑은 제시어에 맞춰 새해 덕담을 남겨주시면 참여가 완료됩니다.</p>
+  <p class="small">
+    본 이벤트는 참여자 확인 및 경품 지급을 위해 이름과 전화번호를 수집합니다.<br>
+    수집된 개인정보는 이벤트 종료 후 즉시 파기됩니다.
+  </p>
+  <p class="small"><b>* 개인정보 수집·이용에 동의하신 경우에만 참여 가능합니다.</b></p>
 
-      <div class="btnRow">
-        <button id="btnDraw" type="button">쪽지 뽑기</button>
-        <button id="btnRedraw" type="button">다시 뽑기</button>
-      </div>
+  <!-- 메인 카드 -->
+  <div id="mainCard" class="card">
 
-      <div class="noteBox">
-        <div class="noteLabel">뽑기 분류</div>
-        <div id="topicText" class="noteTopic">-</div>
-      </div>
-
-      <input id="name" type="text" placeholder="이름" />
-      <input id="phone" type="tel" inputmode="numeric" placeholder="전화번호(숫자만)" />
-      <input id="category" type="text" placeholder="뽑기 분류" readonly />
-      <textarea id="message" placeholder="덕담 내용을 입력하세요"></textarea>
-
-      <button id="btnSubmit" class="submit" type="button">제출</button>
-      <div id="status" class="status"></div>
+    <div class="gifbox">
+      <!-- 초기 정지 이미지 -->
+      <img id="gifImg" src="idle.png" alt="복주머니">
     </div>
+
+    <div class="btnrow">
+      <button id="pickBtn">쪽지 뽑기</button>
+      <button id="repickBtn" disabled>다시 뽑기</button>
+    </div>
+
+    <div class="resultbox">
+      <div class="resultlabel">
+        <div class="top">뽑기 분류</div>
+        <div id="categoryText" class="val">-</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>이름</label>
+        <input id="name" placeholder="이름을 입력하세요">
+      </div>
+      <div>
+        <label>전화번호(숫자만)</label>
+        <input id="phone" placeholder="01012345678" inputmode="numeric">
+      </div>
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>덕담 내용을 입력하세요</label>
+      <textarea id="message" placeholder="쪽지를 뽑은 뒤 입력 가능합니다." disabled></textarea>
+    </div>
+
+    <div class="submitrow">
+      <button id="submitBtn" class="submitbtn" disabled>제출</button>
+    </div>
+
+    <div id="status" class="status"></div>
   </div>
 
-  <script>
-    // ✅ 형님이 준 "새 URL" 이미 반영
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXpetJEtenNZXzOmlSX0zpj2YYNrrmcEH5jy-4k0fzGe4fem8jWJdULfF1646ws_uH-w/exec";
+  <!-- 제출 후 -->
+  <div id="finalCard" class="card" style="display:none;">
+    <div class="final">감사합니다. 새해 복 많이 받으세요!</div>
+  </div>
 
-    const TOPICS = ["사랑","건강","행복","가족","목표"];
-    const $ = (id) => document.getElementById(id);
+</div>
 
-    const imgIdle  = $("imgIdle");
-    const imgThrow = $("imgThrow");
-    const imgAfter = $("imgAfter");
+<script>
+/* ================= 설정 ================= */
 
-    const btnDraw = $("btnDraw");
-    const btnRedraw = $("btnRedraw");
-    const topicText = $("topicText");
+// ✅ Apps Script 웹앱 URL (형님이 준 주소)
+const WEB_APP_URL =
+  "https://script.google.com/macros/s/AKfycbxDrddO3A-oGM8_tBLJ8OzeVpKR06U7_ZLP1sza_BaMawzoJXmCPWB8rszQV0vinwp9/exec";
 
-    const nameEl = $("name");
-    const phoneEl = $("phone");
-    const categoryEl = $("category");
-    const messageEl = $("message");
-    const btnSubmit = $("btnSubmit");
-    const statusEl = $("status");
+// 이미지 파일
+const IMG_IDLE  = "idle.png";
+const IMG_THROW = "throw.gif";
+const IMG_AFTER = "after.png";
 
-    let isAnimating = false;
+// 뽑기 항목
+const CATEGORIES = ["사랑", "건강", "가족", "목표(꿈)", "행복"];
 
-    function sanitizePhone(s){ return (s||"").replace(/[^\d]/g,""); }
+/* ================= 요소 ================= */
 
-    function showState(state){
-      imgIdle.style.display  = (state === "idle")  ? "block" : "none";
-      imgThrow.style.display = (state === "throw") ? "block" : "none";
-      imgAfter.style.display = (state === "after") ? "block" : "none";
-    }
+const gifImg = document.getElementById("gifImg");
+const pickBtn = document.getElementById("pickBtn");
+const repickBtn = document.getElementById("repickBtn");
+const submitBtn = document.getElementById("submitBtn");
 
-    function restartGif(imgEl){
-      const src = imgEl.getAttribute("src");
-      imgEl.setAttribute("src", "");
-      requestAnimationFrame(() => imgEl.setAttribute("src", src));
-    }
+const categoryText = document.getElementById("categoryText");
+const nameEl = document.getElementById("name");
+const phoneEl = document.getElementById("phone");
+const msgEl = document.getElementById("message");
+const statusEl = document.getElementById("status");
 
-    function drawTopic(){
-      const idx = Math.floor(Math.random() * TOPICS.length);
-      const t = TOPICS[idx];
-      topicText.textContent = t;
-      categoryEl.value = t;
-      return t;
-    }
+const mainCard = document.getElementById("mainCard");
+const finalCard = document.getElementById("finalCard");
 
-    // ✅ 실패를 성공으로 착각 못 하게: 응답을 읽어서 ok 확인
-    async function saveToSheet(payload){
-      const res = await fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+let currentCategory = "";
 
-      const text = await res.text().catch(() => "");
-      let json = null;
-      try { json = JSON.parse(text); } catch(e) {}
+/* ================= 함수 ================= */
 
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} :: ${text}`);
-      if (json && json.ok === false) throw new Error(`SCRIPT ERROR :: ${json.error || text}`);
+function normalizePhone(v) {
+  return (v || "").replace(/[^0-9]/g, "");
+}
 
-      return true;
-    }
+function updateButtons() {
+  const hasCategory = currentCategory !== "";
+  repickBtn.disabled = !hasCategory;
+  msgEl.disabled = !hasCategory;
 
-    async function playDrawAnimation(){
-      if (isAnimating) return;
-      isAnimating = true;
+  const ok =
+    hasCategory &&
+    nameEl.value.trim() &&
+    normalizePhone(phoneEl.value).length >= 9 &&
+    msgEl.value.trim();
 
-      showState("idle");
-      await new Promise(r => setTimeout(r, 80));
+  submitBtn.disabled = !ok;
+}
 
-      showState("throw");
-      restartGif(imgThrow);
+function pickCategory(isRepick) {
+  // GIF 재생
+  gifImg.src = IMG_THROW;
 
-      await new Promise(r => setTimeout(r, 900));
-      showState("after");
+  // 결과 뽑기
+  const idx = Math.floor(Math.random() * CATEGORIES.length);
+  currentCategory = CATEGORIES[idx];
+  categoryText.textContent = currentCategory;
 
-      isAnimating = false;
-    }
+  // 다시 뽑기면 덕담 리셋
+  if (isRepick) msgEl.value = "";
 
-    async function handleDraw(){
-      statusEl.textContent = "";
-      btnDraw.disabled = true;
-      btnRedraw.disabled = true;
+  // GIF 끝나면 정지 이미지
+  setTimeout(() => {
+    gifImg.src = IMG_AFTER;
+  }, 1200);
 
-      await playDrawAnimation();
-      drawTopic();
+  updateButtons();
+}
 
-      btnDraw.disabled = false;
-      btnRedraw.disabled = false;
-      setTimeout(() => messageEl.focus(), 150);
-    }
+async function submit() {
+  submitBtn.disabled = true;
+  statusEl.textContent = "제출 중입니다…";
 
-    showState("idle");
-    topicText.textContent = "-";
-
-    btnDraw.addEventListener("click", handleDraw);
-    btnRedraw.addEventListener("click", handleDraw);
-
-    btnSubmit.addEventListener("click", async () => {
-      statusEl.textContent = "";
-
-      const name = (nameEl.value||"").trim();
-      const phone = sanitizePhone(phoneEl.value);
-      const category = (categoryEl.value||"").trim();
-      const message = (messageEl.value||"").trim();
-
-      if (!name || !phone) { statusEl.textContent = "이름이랑 전화번호는 필수입니다."; return; }
-      if (phone.length < 10) { statusEl.textContent = "전화번호는 숫자만 정확히 입력해주세요."; return; }
-      if (!category) { statusEl.textContent = "쪽지 뽑기부터 눌러주세요."; return; }
-      if (!message) { statusEl.textContent = "덕담 내용을 입력해주세요."; return; }
-
-      btnSubmit.disabled = true;
-      statusEl.textContent = "제출 중...";
-
-      const payload = { name, phone, category, message };
-
-      try {
-        await saveToSheet(payload);
-        statusEl.textContent = "제출 완료! (시트에 기록됩니다)";
-        messageEl.value = "";
-      } catch (e) {
-        console.error(e);
-        statusEl.textContent = "오류: " + (e?.message || e);
-      } finally {
-        btnSubmit.disabled = false;
-      }
+  try {
+    const body = new URLSearchParams({
+      name: nameEl.value.trim(),
+      phone: normalizePhone(phoneEl.value),
+      category: currentCategory,
+      message: msgEl.value.trim()
     });
-  </script>
+
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body
+    });
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "저장 실패");
+
+    mainCard.style.display = "none";
+    finalCard.style.display = "block";
+
+  } catch (e) {
+    statusEl.textContent = "제출 실패: " + e.message;
+    statusEl.classList.add("bad");
+    submitBtn.disabled = false;
+  }
+}
+
+/* ================= 이벤트 ================= */
+
+pickBtn.onclick = () => pickCategory(false);
+repickBtn.onclick = () => pickCategory(true);
+submitBtn.onclick = submit;
+
+[nameEl, phoneEl, msgEl].forEach(el =>
+  el.addEventListener("input", updateButtons)
+);
+
+phoneEl.addEventListener("input", () => {
+  phoneEl.value = normalizePhone(phoneEl.value);
+});
+
+/* 초기 */
+gifImg.src = IMG_IDLE;
+updateButtons();
+</script>
+
 </body>
 </html>
