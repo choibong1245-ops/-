@@ -26,7 +26,6 @@
 
     input, textarea{ width:820px; max-width:100%; box-sizing:border-box; border:3px solid #111; padding:18px 16px; font-size:34px; outline:none; background:#fff; }
     textarea{ min-height:88px; resize:vertical; }
-
     button{ width:520px; max-width:100%; border:0; background:#fff; font-weight:900; cursor:pointer; font-size:34px; padding:14px; }
     .submit{ width:820px; max-width:100%; border:0; font-size:36px; font-weight:900; margin-top:14px; padding:10px 0; }
     button:disabled{ opacity:.55; cursor:not-allowed; }
@@ -60,9 +59,9 @@
     <div class="center">
       <div class="animBox">
         <div class="animStage">
-          <img id="imgIdle"  src="./idle.png?v=1" />
-          <img id="imgThrow" src="./throw.gif?v=1" />
-          <img id="imgAfter" src="./after.png?v=1" />
+          <img id="imgIdle"  src="idle.png"  alt="idle" />
+          <img id="imgThrow" src="throw.gif" alt="throw" />
+          <img id="imgAfter" src="after.png" alt="after" />
         </div>
       </div>
 
@@ -87,7 +86,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_iQ_7lFbME36oW27scG7tvP5zLP9bVX_4D6Rmg76_g0cMT23dgkUvuJ34Zb0qzYDCGQ/exec";
+    // ✅ 형님이 준 "새 URL" 이미 반영
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXpetJEtenNZXzOmlSX0zpj2YYNrrmcEH5jy-4k0fzGe4fem8jWJdULfF1646ws_uH-w/exec";
 
     const TOPICS = ["사랑","건강","행복","가족","목표"];
     const $ = (id) => document.getElementById(id);
@@ -117,19 +117,39 @@
       imgAfter.style.display = (state === "after") ? "block" : "none";
     }
 
-    function restartGif(img){
-      const src = img.src;
-      img.src = "";
-      requestAnimationFrame(() => img.src = src);
+    function restartGif(imgEl){
+      const src = imgEl.getAttribute("src");
+      imgEl.setAttribute("src", "");
+      requestAnimationFrame(() => imgEl.setAttribute("src", src));
     }
 
     function drawTopic(){
-      const t = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+      const idx = Math.floor(Math.random() * TOPICS.length);
+      const t = TOPICS[idx];
       topicText.textContent = t;
       categoryEl.value = t;
+      return t;
     }
 
-    async function playDraw(){
+    // ✅ 실패를 성공으로 착각 못 하게: 응답을 읽어서 ok 확인
+    async function saveToSheet(payload){
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const text = await res.text().catch(() => "");
+      let json = null;
+      try { json = JSON.parse(text); } catch(e) {}
+
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText} :: ${text}`);
+      if (json && json.ok === false) throw new Error(`SCRIPT ERROR :: ${json.error || text}`);
+
+      return true;
+    }
+
+    async function playDrawAnimation(){
       if (isAnimating) return;
       isAnimating = true;
 
@@ -138,57 +158,61 @@
 
       showState("throw");
       restartGif(imgThrow);
-      await new Promise(r => setTimeout(r, 900));
 
+      await new Promise(r => setTimeout(r, 900));
       showState("after");
+
       isAnimating = false;
     }
 
-    async function saveToSheet(payload){
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      });
-      return true;
+    async function handleDraw(){
+      statusEl.textContent = "";
+      btnDraw.disabled = true;
+      btnRedraw.disabled = true;
+
+      await playDrawAnimation();
+      drawTopic();
+
+      btnDraw.disabled = false;
+      btnRedraw.disabled = false;
+      setTimeout(() => messageEl.focus(), 150);
     }
 
-    btnDraw.onclick = async () => {
-      statusEl.textContent = "";
-      await playDraw();
-      drawTopic();
-      setTimeout(() => messageEl.focus(), 150);
-    };
+    showState("idle");
+    topicText.textContent = "-";
 
-    btnRedraw.onclick = btnDraw.onclick;
+    btnDraw.addEventListener("click", handleDraw);
+    btnRedraw.addEventListener("click", handleDraw);
 
-    btnSubmit.onclick = async () => {
+    btnSubmit.addEventListener("click", async () => {
       statusEl.textContent = "";
 
-      const name = nameEl.value.trim();
+      const name = (nameEl.value||"").trim();
       const phone = sanitizePhone(phoneEl.value);
-      const category = categoryEl.value.trim();
-      const message = messageEl.value.trim();
+      const category = (categoryEl.value||"").trim();
+      const message = (messageEl.value||"").trim();
 
-      if (!name || !phone) { statusEl.textContent = "이름과 전화번호는 필수입니다."; return; }
-      if (phone.length < 10) { statusEl.textContent = "전화번호를 정확히 입력해주세요."; return; }
-      if (!category) { statusEl.textContent = "쪽지 뽑기를 먼저 해주세요."; return; }
+      if (!name || !phone) { statusEl.textContent = "이름이랑 전화번호는 필수입니다."; return; }
+      if (phone.length < 10) { statusEl.textContent = "전화번호는 숫자만 정확히 입력해주세요."; return; }
+      if (!category) { statusEl.textContent = "쪽지 뽑기부터 눌러주세요."; return; }
       if (!message) { statusEl.textContent = "덕담 내용을 입력해주세요."; return; }
 
       btnSubmit.disabled = true;
-      statusEl.textContent = "제출 요청 중…";
+      statusEl.textContent = "제출 중...";
+
+      const payload = { name, phone, category, message };
 
       try {
-        await saveToSheet({ name, phone, category, message });
-        statusEl.textContent = "제출 요청 완료! (시트에 곧 기록됩니다)";
+        await saveToSheet(payload);
+        statusEl.textContent = "제출 완료! (시트에 기록됩니다)";
         messageEl.value = "";
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = "오류: " + (e?.message || e);
       } finally {
         btnSubmit.disabled = false;
       }
-    };
-
-    showState("idle");
+    });
   </script>
 </body>
 </html>
