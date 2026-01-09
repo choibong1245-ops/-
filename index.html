@@ -223,33 +223,31 @@ function pickCategory(isRepick) {
   if (isRepick) msgEl.value = "";
 
   // 애니 재생 중 잠깐 잠그기
-  repickBtn.disabled = true;
-  msgEl.disabled = true;
-  submitBtn.disabled = true;
+repickBtn.disabled = true;
+msgEl.disabled = true;
+submitBtn.disabled = true;
 
-  const ANIM_MS = 1200; // throw.gif 길이에 맞춰 조절
+const ANIM_MS = 1200; // throw.gif 길이에 맞춰 조절
 
+setTimeout(() => {
+  // 애니 끝: 정지 이미지
+  gifImg.src = IMG_AFTER;
+
+  // 여기서 결과 확정
+  const idx = Math.floor(Math.random() * CATEGORIES.length);
+  currentCategory = CATEGORIES[idx];
+
+  // ✅ 분류박스 나타나며 결과 표시
+  categoryText.textContent = currentCategory;
+  resultBox.style.display = "block";
+
+  // ✅ 덕담 입력 활성화 (모바일 자동 스크롤 방지용 딜레이)
   setTimeout(() => {
-    // 애니 끝: 정지 이미지
-    gifImg.src = IMG_AFTER;
-
-    // 여기서 결과 확정
-    const idx = Math.floor(Math.random() * CATEGORIES.length);
-    currentCategory = CATEGORIES[idx];
-
-    // ✅ 분류박스 나타나며 결과 표시
-    categoryText.textContent = currentCategory;
-    resultBox.style.display = "block";
-
-    // 덕담 입력 활성화
     msgEl.disabled = false;
-
-    // 버튼 상태 갱신
     updateButtons();
+  }, 300);
 
-    // 커서 이동(선택)
-    msgEl.focus();
-  }, ANIM_MS);
+}, ANIM_MS);
 }
 
 async function submit() {
