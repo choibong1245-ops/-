@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>새해 덕담 쪽지뽑기</title>
+  <style>
+    body{ margin:0; background:#fff; color:#111; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+    .wrap{ max-width:980px; margin:0 auto; padding:28px 22px 50px; }
+    .h1{ font-size:66px; font-weight:900; margin:0 0 10px; letter-spacing:-1px; }
+    .h2{ font-size:62px; font-weight:900; margin:26px 0 10px; letter-spacing:-1px; }
+    .p{ font-size:30px; line-height:1.45; margin:0 0 8px; }
+    .star{ font-size:16px; color:#333; margin-top:8px; }
+    .center{ display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:18px; }
+
+    .animBox{ width:520px; max-width:100%; border:3px solid #111; padding:22px; display:flex; justify-content:center; align-items:center; background:#fff; }
+    .animStage{ position:relative; width:260px; height:260px; max-width:75vw; max-height:75vw; }
+    .animStage img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:none; pointer-events:none; }
+
+    .btnRow{ display:flex; gap:12px; width:520px; max-width:100%; }
+    .btnRow button{ flex:1; }
+
+    .noteBox{ width:520px; max-width:100%; border:3px solid #111; padding:16px; text-align:center; background:#fff; }
+    .noteLabel{ font-size:18px; color:#444; margin-bottom:6px; }
+    .noteTopic{ font-size:36px; font-weight:900; margin:0; }
+
+    input, textarea{ width:820px; max-width:100%; box-sizing:border-box; border:3px solid #111; padding:18px 16px; font-size:34px; outline:none; background:#fff; }
+    textarea{ min-height:88px; resize:vertical; }
+
+    button{ width:520px; max-width:100%; border:0; background:#fff; font-weight:900; cursor:pointer; font-size:34px; padding:14px; }
+    .submit{ width:820px; max-width:100%; border:0; font-size:36px; font-weight:900; margin-top:14px; padding:10px 0; }
+    button:disabled{ opacity:.55; cursor:not-allowed; }
+    .status{ margin-top:10px; font-size:18px; color:#111; }
+
+    @media (max-width:640px){
+      .h1,.h2{ font-size:44px; }
+      .p{ font-size:22px; }
+      input, textarea{ font-size:24px; padding:14px 12px; }
+      button{ font-size:22px; }
+      .noteTopic{ font-size:28px; }
+      .submit{ font-size:28px; }
+      .animStage{ width:220px; height:220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="h1">소개말</div>
+    <p class="p">새해를 맞아 모두에게 전하는 따뜻한 한마디를 남겨주세요.</p>
+
+    <div class="h2">참여방법</div>
+    <p class="p">복주머니에서 나온 쪽지에 있는 주제에 맞춰 덕담을 남겨주세요.</p>
+    <p class="p">예시) 목표(꿈) - 올해는 원하는 곳에 취업하게 해주세요.</p>
+    <p class="star">
+      * 본 이벤트는 참여자 확인 및 경품 제공을 위해 이름과 전화번호를 수집하며,
+      수집된 개인정보는 이벤트 종료 후 즉시 파기됩니다.
+      개인정보 수집·이용에 동의하는 경우에만 참여가 가능합니다.
+    </p>
+
+    <div class="center">
+      <div class="animBox">
+        <div class="animStage">
+          <img id="imgIdle"  src="./idle.png?v=1" />
+          <img id="imgThrow" src="./throw.gif?v=1" />
+          <img id="imgAfter" src="./after.png?v=1" />
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button id="btnDraw" type="button">쪽지 뽑기</button>
+        <button id="btnRedraw" type="button">다시 뽑기</button>
+      </div>
+
+      <div class="noteBox">
+        <div class="noteLabel">뽑기 분류</div>
+        <div id="topicText" class="noteTopic">-</div>
+      </div>
+
+      <input id="name" type="text" placeholder="이름" />
+      <input id="phone" type="tel" inputmode="numeric" placeholder="전화번호(숫자만)" />
+      <input id="category" type="text" placeholder="뽑기 분류" readonly />
+      <textarea id="message" placeholder="덕담 내용을 입력하세요"></textarea>
+
+      <button id="btnSubmit" class="submit" type="button">제출</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_iQ_7lFbME36oW27scG7tvP5zLP9bVX_4D6Rmg76_g0cMT23dgkUvuJ34Zb0qzYDCGQ/exec";
+
+    const TOPICS = ["사랑","건강","행복","가족","목표"];
+    const $ = (id) => document.getElementById(id);
+
+    const imgIdle  = $("imgIdle");
+    const imgThrow = $("imgThrow");
+    const imgAfter = $("imgAfter");
+
+    const btnDraw = $("btnDraw");
+    const btnRedraw = $("btnRedraw");
+    const topicText = $("topicText");
+
+    const nameEl = $("name");
+    const phoneEl = $("phone");
+    const categoryEl = $("category");
+    const messageEl = $("message");
+    const btnSubmit = $("btnSubmit");
+    const statusEl = $("status");
+
+    let isAnimating = false;
+
+    function sanitizePhone(s){ return (s||"").replace(/[^\d]/g,""); }
+
+    function showState(state){
+      imgIdle.style.display  = (state === "idle")  ? "block" : "none";
+      imgThrow.style.display = (state === "throw") ? "block" : "none";
+      imgAfter.style.display = (state === "after") ? "block" : "none";
+    }
+
+    function restartGif(img){
+      const src = img.src;
+      img.src = "";
+      requestAnimationFrame(() => img.src = src);
+    }
+
+    function drawTopic(){
+      const t = TOPICS[Math.floor(Math.random() * TOPICS.length)];
+      topicText.textContent = t;
+      categoryEl.value = t;
+    }
+
+    async function playDraw(){
+      if (isAnimating) return;
+      isAnimating = true;
+
+      showState("idle");
+      await new Promise(r => setTimeout(r, 80));
+
+      showState("throw");
+      restartGif(imgThrow);
+      await new Promise(r => setTimeout(r, 900));
+
+      showState("after");
+      isAnimating = false;
+    }
+
+    async function saveToSheet(payload){
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      return true;
+    }
+
+    btnDraw.onclick = async () => {
+      statusEl.textContent = "";
+      await playDraw();
+      drawTopic();
+      setTimeout(() => messageEl.focus(), 150);
+    };
+
+    btnRedraw.onclick = btnDraw.onclick;
+
+    btnSubmit.onclick = async () => {
+      statusEl.textContent = "";
+
+      const name = nameEl.value.trim();
+      const phone = sanitizePhone(phoneEl.value);
+      const category = categoryEl.value.trim();
+      const message = messageEl.value.trim();
+
+      if (!name || !phone) { statusEl.textContent = "이름과 전화번호는 필수입니다."; return; }
+      if (phone.length < 10) { statusEl.textContent = "전화번호를 정확히 입력해주세요."; return; }
+      if (!category) { statusEl.textContent = "쪽지 뽑기를 먼저 해주세요."; return; }
+      if (!message) { statusEl.textContent = "덕담 내용을 입력해주세요."; return; }
+
+      btnSubmit.disabled = true;
+      statusEl.textContent = "제출 요청 중…";
+
+      try {
+        await saveToSheet({ name, phone, category, message });
+        statusEl.textContent = "제출 요청 완료! (시트에 곧 기록됩니다)";
+        messageEl.value = "";
+      } finally {
+        btnSubmit.disabled = false;
+      }
+    };
+
+    showState("idle");
+  </script>
+</body>
+</html>
